@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using MapGen;
+using System.Linq;
 
 public class Node
 {
@@ -58,7 +59,26 @@ public class PathFinder
             // You just need to fill code inside this foreach only
             foreach (Tile nextTile in current.tile.Adjacents)
             {
-                
+                if (DoneList.Any(node => node.tile == nextTile))
+                    continue;
+
+                int movementCost = 10;
+                double gCost = current.costSoFar + movementCost;
+
+                int hCost = Math.Abs(nextTile.indexX - goalTile.indexX) + Math.Abs(nextTile.indexY - goalTile.indexY);
+
+                Node existingNode = TODOList.FirstOrDefault(node => node.tile == nextTile);
+
+                if (existingNode == null)
+                {
+                    TODOList.Add(new Node(nextTile, gCost + hCost, current, gCost));
+                }
+                else if (gCost < existingNode.costSoFar)
+                {
+                    existingNode.costSoFar = gCost;
+                    existingNode.priority = gCost + hCost;
+                    existingNode.cameFrom = current;
+                }
             }
         }
         return new Queue<Tile>(); // Returns an empty Path if no path is found
@@ -92,7 +112,7 @@ public class PathFinder
             // Just increase the F cost of the enemy tile and the tiles around it by a certain ammount (say 30)
             foreach (Tile nextTile in current.tile.Adjacents)
             {
-
+                
             }
         }
         return new Queue<Tile>(); // Returns an empty Path
